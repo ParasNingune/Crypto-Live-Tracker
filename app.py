@@ -64,6 +64,46 @@ from openpyxl.styles import PatternFill
 import os
 from fpdf import FPDF
 
+def update_google_sheet(data):
+   
+    headers = ['Cryptocurrency Name', 'Symbol', 'Current Price (USD)', 'Market Capitalization',
+               '24-hour Trading Volume', 'Price Change (24h, %)']
+    
+    existing_data = sheet.get_all_values()
+
+    if len(existing_data) == 0:
+        sheet.append_row(headers)
+        existing_data = [headers]
+
+    for coin in data:
+        updated = False
+        for i, row in enumerate(existing_data[1:], start=1):
+            if row[1].upper() == coin['symbol'].upper():
+                
+                existing_data[i] = [
+                    coin['name'],
+                    coin['symbol'].upper(),
+                    coin['current_price'],
+                    coin['market_cap'],
+                    coin['total_volume'],
+                    coin['price_change_percentage_24h']
+                ]
+                updated = True
+                break
+
+        if not updated:
+            existing_data.append([
+                coin['name'],
+                coin['symbol'].upper(),
+                coin['current_price'],
+                coin['market_cap'],
+                coin['total_volume'],
+                coin['price_change_percentage_24h']
+            ])
+
+    sheet.clear()
+    sheet.append_rows(existing_data, value_input_option="USER_ENTERED")
+
 
 def update_excel_sheet(data):
     file_path = 'crypto_data.xlsx'
